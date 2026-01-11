@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<title>MC PeopleDle</title>
+<style>
+  body {
+    background: #121213;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    width: 800px;
+    margin-top: 40px;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    background: #1e1e1f;
+    color: #fff;
+    border: 1px solid #333;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #333;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .green { background: #3aa655; }
+  .yellow { background: #c9b458; }
+  .red { background: #b34040; }
+  .white { background: #e4e4e4; color: #000; }
+
+  footer {
+    margin-top: 20px;
+    font-size: 12px;
+    text-align: center;
+    color: #888;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>MC PeopleDle 🇵🇱</h1>
+
+  <input id="guessInput" list="peopleList" placeholder="Wpisz nick..." />
+  <datalist id="peopleList"></datalist>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nick</th>
+        <th>Typ</th>
+        <th>Ranga</th>
+      </tr>
+    </thead>
+    <tbody id="results"></tbody>
+  </table>
+
+  <footer>
+    Fan-made project. Not affiliated with Mojang.
+  </footer>
+</div>
+
+<script>
+const people = [
+  {
+    name: "Bladii",
+    typ: ["Gracz", "Featherowiec"],
+    ranga: "Brak",
+    rangaPast: "Media"
+  },
+  {
+    name: "ReZi",
+    typ: ["Emeryt"],
+    ranga: "Media",
+    rangaPast: "Perm"
+  }
+];
+
+// AUTOCOMPLETE
+const datalist = document.getElementById("peopleList");
+people.forEach(p => {
+  const o = document.createElement("option");
+  o.value = p.name;
+  datalist.appendChild(o);
+});
+
+// OSOBA DNIA
+const target = people[Math.floor(Date.now() / 86400000) % people.length];
+
+// TYP
+function compareTyp(guess, target) {
+  if (guess.typ.some(t => target.typ.includes(t))) {
+    return guess.typ.length === target.typ.length &&
+           guess.typ.every(t => target.typ.includes(t))
+      ? "green"
+      : "yellow";
+  }
+  return "red";
+}
+
+// RANGA
+function compareRanga(guess, target) {
+  if (guess.ranga === target.ranga) return "green";
+  if (
+    guess.ranga === target.rangaPast ||
+    guess.rangaPast === target.ranga
+  ) return "white";
+  return "red";
+}
+
+// OBSŁUGA INPUTU
+document.getElementById("guessInput").addEventListener("change", e => {
+  const name = e.target.value;
+  const guess = people.find(p => p.name === name);
+  if (!guess) return;
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td>${guess.name}</td>
+    <td class="${compareTyp(guess, target)}">${guess.typ.join(", ")}</td>
+    <td class="${compareRanga(guess, target)}">${guess.ranga}</td>
+  `;
+
+  document.getElementById("results").appendChild(row);
+  e.target.value = "";
+});
+</script>
+
+</body>
+</html>
